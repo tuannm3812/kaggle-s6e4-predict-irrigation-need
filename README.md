@@ -1,5 +1,7 @@
 # Kaggle Playground Series S6E4: Predicting Irrigation Need
 
+![Irrigation banner](https://media.hswstatic.com/eyJidWNrZXQiOiJjb250ZW50Lmhzd3N0YXRpYy5jb20iLCJrZXkiOiJnaWZcL0lycmlnYXRpb24uanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoiMTIwMCJ9fX0=)
+
 This repo is set up for Kaggle Notebooks only. It intentionally does not include local dependency setup or downloaded competition data.
 
 Competition: <https://www.kaggle.com/competitions/playground-series-s6e4>
@@ -8,6 +10,7 @@ Competition: <https://www.kaggle.com/competitions/playground-series-s6e4>
 
 - `notebooks/01_eda_predict_irrigation_need.ipynb` - Kaggle-only EDA report for the competition files mounted under `/kaggle/input`.
 - `notebooks/02_baseline_models.ipynb` - Kaggle-only baseline modeling notebook with stratified validation, EDA-driven interaction features, CatBoost-first diagnostics, feature interpretation, and submission generation.
+- `notebooks/03_catboost_tuning.ipynb` - Kaggle-only CatBoost tuning notebook with cross-validation, feature variant comparison, threshold features, feature importance, and tuned submission generation.
 
 ## Kaggle Usage
 
@@ -55,14 +58,22 @@ Based on the latest Kaggle baseline run:
 - Histogram gradient boosting is very close on macro F1 and slightly better on log loss, so it remains a useful sanity-check model.
 - Random forest has the strongest balanced accuracy among the scikit-learn tree baselines, but its log loss is much weaker.
 - CatBoost performs well on the rare `High` class: `0.9653` precision, `0.9205` recall, and `0.9424` F1.
+- CatBoost feature importance confirms the EDA story. The top drivers are `Soil_Moisture`, `Crop_Growth_Stage`, `Mulching_Used`, `Temperature_C`, and `Wind_Speed_kmh`.
+- EDA interaction features are useful but secondary. `Crop_Growth_Stage x Mulching_Used`, `Crop_Growth_Stage x Irrigation_Type`, and `Crop_Growth_Stage x Water_Source` all appear in CatBoost's importance ranking.
 - The first CatBoost submission predicts `Low` at `59.23%`, `Medium` at `37.59%`, and `High` at `3.18%`, close to the training target distribution.
 
 ## Next Step
 
-The next notebook should focus on CatBoost tuning and validation, not more broad EDA. Recommended experiments:
+The third notebook focuses on CatBoost tuning and validation, not more broad EDA. Recommended experiments:
 
 1. Run stratified cross-validation for CatBoost to confirm holdout stability.
 2. Tune CatBoost depth, learning rate, iterations, L2 regularization, random strength, bagging temperature, and class weights.
 3. Compare raw features against the EDA interaction features.
 4. Track macro F1, log loss, and `High` precision/recall together.
 5. Use feature importance and error analysis to decide whether threshold features from `Soil_Moisture`, `Rainfall_mm`, `Temperature_C`, and `Wind_Speed_kmh` help.
+
+Current refinement direction:
+
+- EDA is sufficiently complete; additional EDA should be driven by model errors rather than broad exploration.
+- The baseline notebook is also mature enough; the main useful refinement is interpreting CatBoost and using it to guide tuning.
+- The next decision point is whether threshold features or class weighting improve cross-validation without hurting log loss or `High` precision.
