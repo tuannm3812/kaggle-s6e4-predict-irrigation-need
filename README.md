@@ -63,6 +63,18 @@ Based on the latest Kaggle baseline run:
 - EDA interaction features are useful but secondary. `Crop_Growth_Stage x Mulching_Used`, `Crop_Growth_Stage x Irrigation_Type`, and `Crop_Growth_Stage x Water_Source` all appear in CatBoost's importance ranking.
 - The first CatBoost submission predicts `Low` at `59.23%`, `Medium` at `37.59%`, and `High` at `3.18%`, close to the training target distribution.
 
+## Current Submission Result
+
+The reused CatBoost tuning submission has been validated and submitted.
+
+- Public score: `0.96094`
+- Best score: `0.96094`
+- Submission source: output from `s6e4-predicting-irrigation-need-catboost-tuning`
+- Submission validation: `270,000` rows, columns `id` and `Irrigation_Need`, matching sample-submission ID order.
+- Prediction mix: `Low 59.23%`, `Medium 37.59%`, `High 3.18%`.
+
+This score is slightly below the internal CV macro F1 estimate (`0.96994`), which is expected because CV and public leaderboard are measured on different rows. The gap is not alarming, but it suggests future improvements should be validated carefully and not judged from a single holdout split.
+
 ## Next Step
 
 The third notebook focuses on CatBoost tuning and validation, not more broad EDA. The latest tuning run took about 7 hours, so future submission work should reuse its output unless there is a new modeling idea to test.
@@ -86,4 +98,5 @@ Current refinement direction:
 
 - EDA is sufficiently complete; additional EDA should be driven by model errors rather than broad exploration.
 - The baseline notebook is also mature enough; the main useful refinement is interpreting CatBoost and using it to guide tuning.
-- The tuning run suggests threshold features and class weighting are not the next best direction. The next meaningful refinement is likely ensembling or calibration, not another broad CatBoost grid.
+- The tuning run suggests threshold features and class weighting are not the next best direction.
+- The next meaningful refinement is likely a compact ensemble or probability calibration experiment, not another broad CatBoost grid.
