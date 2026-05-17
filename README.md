@@ -11,6 +11,7 @@ Competition: <https://www.kaggle.com/competitions/playground-series-s6e4>
 - `notebooks/01_eda_predict_irrigation_need.ipynb` - Kaggle-only EDA report for the competition files mounted under `/kaggle/input`.
 - `notebooks/02_baseline_models.ipynb` - Kaggle-only baseline modeling notebook with stratified validation, EDA-driven interaction features, CatBoost-first diagnostics, feature interpretation, and submission generation.
 - `notebooks/03_catboost_tuning.ipynb` - Kaggle-only CatBoost tuning notebook with cross-validation, feature variant comparison, threshold features, feature importance, and tuned submission generation.
+- `notebooks/04_reuse_tuning_submission.ipynb` - lightweight Kaggle submission notebook that reuses the output from the long CatBoost tuning run instead of retraining.
 
 ## Kaggle Usage
 
@@ -64,16 +65,25 @@ Based on the latest Kaggle baseline run:
 
 ## Next Step
 
-The third notebook focuses on CatBoost tuning and validation, not more broad EDA. Recommended experiments:
+The third notebook focuses on CatBoost tuning and validation, not more broad EDA. The latest tuning run took about 7 hours, so future submission work should reuse its output unless there is a new modeling idea to test.
 
-1. Run stratified cross-validation for CatBoost to confirm holdout stability.
-2. Tune CatBoost depth, learning rate, iterations, L2 regularization, random strength, bagging temperature, and class weights.
-3. Compare raw features against the EDA interaction features.
-4. Track macro F1, log loss, and `High` precision/recall together.
-5. Use feature importance and error analysis to decide whether threshold features from `Soil_Moisture`, `Rainfall_mm`, `Temperature_C`, and `Wind_Speed_kmh` help.
+Latest CatBoost tuning insights:
+
+- `baseline_interactions` was the best cross-validation experiment by mean macro F1: `0.96994`.
+- `deeper_interactions` had slightly better mean log loss: `0.06016` versus `0.06088`, but did not improve macro F1.
+- Threshold features did not improve the model; they were slightly behind the baseline interaction setup.
+- Class weighting increased `High` recall to about `0.946`, but it reduced macro F1 to about `0.9578` and worsened log loss to about `0.0744`.
+- The selected tuned submission still uses `baseline_interactions` and predicts `Low` at `59.23%`, `Medium` at `37.59%`, and `High` at `3.18%`.
+
+Recommended workflow:
+
+1. Use `04_reuse_tuning_submission.ipynb` to attach and validate the output from the long tuning run:
+   <https://www.kaggle.com/code/tuannm3823/s6e4-predicting-irrigation-need-catboost-tuning?scriptVersionId=320060317>
+2. Submit the reused `submission.csv` first.
+3. Only rerun `03_catboost_tuning.ipynb` when testing a materially new idea, such as ensembling, probability calibration, or a narrower CatBoost search around the best interaction setup.
 
 Current refinement direction:
 
 - EDA is sufficiently complete; additional EDA should be driven by model errors rather than broad exploration.
 - The baseline notebook is also mature enough; the main useful refinement is interpreting CatBoost and using it to guide tuning.
-- The next decision point is whether threshold features or class weighting improve cross-validation without hurting log loss or `High` precision.
+- The tuning run suggests threshold features and class weighting are not the next best direction. The next meaningful refinement is likely ensembling or calibration, not another broad CatBoost grid.
