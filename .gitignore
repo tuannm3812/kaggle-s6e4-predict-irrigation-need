@@ -1,0 +1,14 @@
+.ipynb_checkpoints/
+__pycache__/
+*.py[cod]
+
+# Keep Kaggle competition data out of git.
+data/
+input/
+*.csv
+*.parquet
+*.zip
+
+# Local notebook artifacts.
+*.log
+submission.csv
