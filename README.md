@@ -6,8 +6,8 @@ Competition: <https://www.kaggle.com/competitions/playground-series-s6e4>
 
 ## Notebooks
 
-- `notebooks/01_eda_predict_irrigation_need.ipynb` - Kaggle-only EDA for the competition files mounted under `/kaggle/input`.
-- `notebooks/02_baseline_models.ipynb` - Kaggle-only baseline modeling notebook with stratified validation, EDA-driven interaction features, model diagnostics, and submission generation.
+- `notebooks/01_eda_predict_irrigation_need.ipynb` - Kaggle-only EDA report for the competition files mounted under `/kaggle/input`.
+- `notebooks/02_baseline_models.ipynb` - Kaggle-only baseline modeling notebook with stratified validation, EDA-driven interaction features, CatBoost-first diagnostics, feature interpretation, and submission generation.
 
 ## Kaggle Usage
 
@@ -36,12 +36,33 @@ Based on the latest Kaggle EDA run:
 
 ## Modeling Plan
 
-The EDA is sufficient to move into experiments. The first modeling notebook now starts with:
+The EDA is sufficient to move into experiments. The first modeling notebook starts with:
 
 1. Stratified holdout validation and optional stratified cross-validation.
 2. Metrics beyond accuracy: macro F1, weighted F1, balanced accuracy, log loss where available, classification report, and confusion matrices.
-3. Conservative baselines: majority-class dummy, one-hot logistic regression, one-hot random forest, histogram gradient boosting, and optional CatBoost if available in Kaggle.
+3. Conservative baselines: majority-class dummy, one-hot logistic regression, one-hot random forest, histogram gradient boosting, and CatBoost as the primary candidate.
 4. EDA-driven interaction features: `Crop_Growth_Stage x Mulching_Used`, `Crop_Growth_Stage x Water_Source`, and `Crop_Growth_Stage x Irrigation_Type`.
-5. A final training and `submission.csv` generation section.
+5. CatBoost feature-importance interpretation.
+6. A final training and `submission.csv` generation section.
 
 Primary modeling risk: the rare `High` class. Accuracy alone will not be enough; each experiment should inspect `High` precision, recall, and confusion with `Medium`.
+
+## Current Baseline Summary
+
+Based on the latest Kaggle baseline run:
+
+- CatBoost is the best holdout model by macro F1: `0.9851` accuracy, `0.9711` macro F1, `0.9638` balanced accuracy, and `0.0602` log loss.
+- Histogram gradient boosting is very close on macro F1 and slightly better on log loss, so it remains a useful sanity-check model.
+- Random forest has the strongest balanced accuracy among the scikit-learn tree baselines, but its log loss is much weaker.
+- CatBoost performs well on the rare `High` class: `0.9653` precision, `0.9205` recall, and `0.9424` F1.
+- The first CatBoost submission predicts `Low` at `59.23%`, `Medium` at `37.59%`, and `High` at `3.18%`, close to the training target distribution.
+
+## Next Step
+
+The next notebook should focus on CatBoost tuning and validation, not more broad EDA. Recommended experiments:
+
+1. Run stratified cross-validation for CatBoost to confirm holdout stability.
+2. Tune CatBoost depth, learning rate, iterations, L2 regularization, random strength, bagging temperature, and class weights.
+3. Compare raw features against the EDA interaction features.
+4. Track macro F1, log loss, and `High` precision/recall together.
+5. Use feature importance and error analysis to decide whether threshold features from `Soil_Moisture`, `Rainfall_mm`, `Temperature_C`, and `Wind_Speed_kmh` help.
