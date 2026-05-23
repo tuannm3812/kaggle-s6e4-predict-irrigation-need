@@ -24,10 +24,21 @@ This repository contains a Kaggle-only workflow for the [Playground Series S6E4 
 
 | Notebook | Purpose | Notes |
 | --- | --- | --- |
-| `notebooks/01_eda_predict_irrigation_need.ipynb` | Exploratory data analysis | Data quality, target balance, feature behavior, drift checks, and EDA summary |
-| `notebooks/02_baseline_models.ipynb` | Baseline modeling | Dummy, logistic regression, random forest, histogram gradient boosting, CatBoost, diagnostics, and feature importance |
-| `notebooks/03_catboost_tuning.ipynb` | CatBoost tuning | Stratified CV, feature variants, class weighting, threshold features, and tuned submission generation |
-| `notebooks/04_reuse_tuning_submission.ipynb` | Fast submission reuse | Validates and reuses the long tuning run output without retraining |
+| `notebooks/1_eda_predict_irrigation_need.ipynb` | Exploratory data analysis | Data quality, target balance, feature behavior, drift checks, and EDA summary |
+| `notebooks/2_baseline_models.ipynb` | Baseline modeling | Dummy, logistic regression, random forest, histogram gradient boosting, CatBoost, diagnostics, and feature importance |
+| `notebooks/3_catboost_tuning.ipynb` | CatBoost tuning | Stratified CV, feature variants, class weighting, threshold features, and tuned submission generation |
+| `notebooks/4_reuse_tuning_submission.ipynb` | Fast submission reuse | Validates and reuses the long tuning run output without retraining |
+
+## Documentation
+
+| Document | Purpose |
+| --- | --- |
+| `docs/coding_standards.md` | Notebook-first standards for this Kaggle project |
+| `docs/1_instructions.md` | Competition objective, task framing, and solution approach |
+| `docs/2_eda_insights.md` | Detailed EDA findings and modeling implications |
+| `docs/3_baseline_models.md` | Logic flow, approach, and results for baseline modeling |
+| `docs/4_catboost_tuning.md` | Logic flow, approach, and results for CatBoost tuning |
+| `docs/5_reuse_tuning_submission.md` | Validation flow and results for submission reuse |
 
 ## Kaggle Usage
 
@@ -39,7 +50,7 @@ This repository contains a Kaggle-only workflow for the [Playground Series S6E4 
 For final submission reuse, attach the output from:
 <https://www.kaggle.com/code/tuannm3823/s6e4-predicting-irrigation-need-catboost-tuning?scriptVersionId=320060317>
 
-Then run `notebooks/04_reuse_tuning_submission.ipynb`.
+Then run `notebooks/4_reuse_tuning_submission.ipynb`.
 
 ## Key EDA Findings
 
@@ -98,4 +109,4 @@ Recommended next experiments:
 1. Build a compact ensemble using the strongest CatBoost and histogram gradient boosting variants.
 2. Test probability calibration if leaderboard behavior suggests calibration matters.
 3. Analyze errors for the `High` class before adding more features.
-4. Keep `04_reuse_tuning_submission.ipynb` as the fast path for validating and resubmitting saved outputs.
+4. Keep `4_reuse_tuning_submission.ipynb` as the fast path for validating and resubmitting saved outputs.
