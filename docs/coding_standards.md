@@ -25,6 +25,7 @@ Use numbered, stable notebook names that match the actual competition workflow:
 2. `2_baseline_models.ipynb`
 3. `3_catboost_tuning.ipynb`
 4. `4_reuse_tuning_submission.ipynb`
+5. `5_compact_ensemble_and_thresholds.ipynb`
 
 Notebook names should describe the Kaggle action performed in the file. Do not
 split training and submission into separate notebooks when the intended Kaggle

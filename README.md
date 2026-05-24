@@ -28,6 +28,7 @@ This repository contains a Kaggle-only workflow for the [Playground Series S6E4 
 | `notebooks/2_baseline_models.ipynb` | Baseline modeling | Dummy, logistic regression, random forest, histogram gradient boosting, CatBoost, diagnostics, and feature importance |
 | `notebooks/3_catboost_tuning.ipynb` | CatBoost tuning | Stratified CV, feature variants, class weighting, threshold features, and tuned submission generation |
 | `notebooks/4_reuse_tuning_submission.ipynb` | Fast submission reuse | Validates and reuses the long tuning run output without retraining |
+| `notebooks/5_compact_ensemble_and_thresholds.ipynb` | Compact ensemble | Tests CatBoost/HGB probability blending and conservative `High` threshold rules |
 
 ## Documentation
 
@@ -39,6 +40,8 @@ This repository contains a Kaggle-only workflow for the [Playground Series S6E4 
 | `docs/3_baseline_models.md` | Logic flow, approach, and results for baseline modeling |
 | `docs/4_catboost_tuning.md` | Logic flow, approach, and results for CatBoost tuning |
 | `docs/5_reuse_tuning_submission.md` | Validation flow and results for submission reuse |
+| `docs/6_output_insights_next_steps.md` | Output interpretation and recommended next experiments |
+| `docs/7_compact_ensemble_and_thresholds.md` | Logic flow and decision rules for the ensemble notebook |
 
 ## Kaggle Usage
 
@@ -106,7 +109,7 @@ The broad EDA, baseline comparison, and CatBoost tuning work are complete. The n
 
 Recommended next experiments:
 
-1. Build a compact ensemble using the strongest CatBoost and histogram gradient boosting variants.
+1. Run `notebooks/5_compact_ensemble_and_thresholds.ipynb` to test a compact ensemble using the strongest CatBoost and histogram gradient boosting variants.
 2. Test probability calibration if leaderboard behavior suggests calibration matters.
 3. Analyze errors for the `High` class before adding more features.
 4. Keep `4_reuse_tuning_submission.ipynb` as the fast path for validating and resubmitting saved outputs.
