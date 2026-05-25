@@ -1,4 +1,4 @@
-# Kaggle Playground Series S6E4: Predicting Irrigation Need
+# Kaggle Playground S6E4: Predicting Irrigation Need
 
 ![Irrigation banner](https://media.hswstatic.com/eyJidWNrZXQiOiJjb250ZW50Lmhzd3N0YXRpYy5jb20iLCJrZXkiOiJnaWZcL0lycmlnYXRpb24uanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoiMTIwMCJ9fX0=)
 
@@ -6,31 +6,104 @@
 ![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square&logo=python&logoColor=white)
 ![CatBoost](https://img.shields.io/badge/Model-CatBoost-FFCC00?style=flat-square)
 ![Public Score](https://img.shields.io/badge/Public%20Score-0.96094-success?style=flat-square)
-![Workflow](https://img.shields.io/badge/Workflow-Kaggle%20Notebooks%20Only-lightgrey?style=flat-square)
+![Workflow](https://img.shields.io/badge/Workflow-Kaggle%20Notebook-lightgrey?style=flat-square)
 
-This repository contains a Kaggle-only workflow for the [Playground Series S6E4 competition](https://www.kaggle.com/competitions/playground-series-s6e4). It intentionally avoids local dependency setup and downloaded data; all notebooks are designed to run with Kaggle-mounted inputs under `/kaggle/input`.
+This project solves Kaggle Playground Series S6E4 as a notebook-first tabular
+classification workflow. The task is to predict `Irrigation_Need` as `Low`,
+`Medium`, or `High` from crop, soil, weather, water-source, and irrigation
+context.
 
-## Progress Snapshot
+The repository is intentionally Kaggle-native: notebooks load data from
+`/kaggle/input`, write submissions to `/kaggle/working/submission.csv`, and avoid
+committing raw competition data.
 
-| Area | Status | Key Result |
-| --- | --- | --- |
-| EDA | Complete | Clean dataset, low train/test drift, strong signal from soil moisture, growth stage, mulching, temperature, and wind speed |
-| Baseline modeling | Complete | CatBoost selected as primary model with holdout macro F1 `0.9711` |
-| Tuning | Complete | `baseline_interactions` remained best by CV macro F1 `0.96994` |
-| Submission reuse | Complete | Validated tuning output and submitted public score `0.96094` |
-| Next work | Planned | Compact ensemble or calibration experiment |
+## Project Snapshot
+
+| Item | Result |
+| --- | ---: |
+| Training rows | `630,000` |
+| Test rows | `270,000` |
+| Predictors | `19` raw features |
+| Target classes | `Low`, `Medium`, `High` |
+| Best public score so far | `0.96094` |
+| Best stable CV model | CatBoost `baseline_interactions` |
+| Best ensemble CV test | CatBoost + HGB with `P(High) >= 0.45` |
+
+## Technical Skills Demonstrated
+
+| Area | Evidence in Project |
+| --- | --- |
+| Exploratory data analysis | Data quality checks, target balance, drift checks, feature-target relationships |
+| Tabular ML | CatBoost, histogram gradient boosting, logistic regression, random forest baselines |
+| Imbalanced classification | Stratified validation, macro F1, balanced accuracy, `High`-class precision/recall tracking |
+| Feature engineering | Growth-stage interactions and EDA-driven threshold tests |
+| Model validation | Holdout, stratified cross-validation, OOF probabilities, confusion matrices, log loss |
+| Ensembling | Weighted probability blending across CatBoost and HGB models |
+| Decision optimization | Conservative `High` probability threshold and `High`/`Medium` ratio tests |
+| Kaggle workflow | Offline-safe notebooks, `/kaggle/input` discovery, validated `submission.csv` generation |
+| Documentation | Notebook companion docs, output insights, coding standards, reproducible run notes |
+
+## Repository Structure
+
+```text
+.
+├── README.md
+├── docs/
+│   ├── 1_instructions.md
+│   ├── 2_eda_insights.md
+│   ├── 3_baseline_models.md
+│   ├── 4_catboost_tuning.md
+│   ├── 5_reuse_tuning_submission.md
+│   ├── 6_output_insights_next_steps.md
+│   ├── 7_compact_ensemble_and_thresholds.md
+│   └── coding_standards.md
+└── notebooks/
+    ├── 1_eda_predict_irrigation_need.ipynb
+    ├── 2_baseline_models.ipynb
+    ├── 3_catboost_tuning.ipynb
+    ├── 4_reuse_tuning_submission.ipynb
+    └── 5_compact_ensemble_and_thresholds.ipynb
+```
+
+No `data/`, `models/`, or `outputs/` folders are required for the committed
+workflow. Kaggle-mounted inputs and generated submissions stay outside git.
+
+## Run Instructions
+
+### Option A: Full Kaggle Workflow
+
+1. Open the Kaggle competition notebook environment for Playground Series S6E4.
+2. Attach the competition dataset if it is not attached automatically.
+3. Upload or copy notebooks from `notebooks/`.
+4. Run notebooks in order:
+   - `1_eda_predict_irrigation_need.ipynb`
+   - `2_baseline_models.ipynb`
+   - `3_catboost_tuning.ipynb`
+   - `5_compact_ensemble_and_thresholds.ipynb`
+5. Submit the generated `/kaggle/working/submission.csv`.
+
+### Option B: Fast Reuse Submission
+
+Use this when re-submitting the saved CatBoost tuning output without retraining.
+
+1. Attach the output from the tuning notebook:
+   <https://www.kaggle.com/code/tuannm3823/s6e4-predicting-irrigation-need-catboost-tuning?scriptVersionId=320060317>
+2. Run `notebooks/4_reuse_tuning_submission.ipynb`.
+3. Confirm validation passes: row count, columns, ID order, non-missing labels,
+   and allowed target classes.
+4. Submit `/kaggle/working/submission.csv`.
 
 ## Notebook Workflow
 
-| Notebook | Purpose | Notes |
+| Notebook | Purpose | Main Output |
 | --- | --- | --- |
-| `notebooks/1_eda_predict_irrigation_need.ipynb` | Exploratory data analysis | Data quality, target balance, feature behavior, drift checks, and EDA summary |
-| `notebooks/2_baseline_models.ipynb` | Baseline modeling | Dummy, logistic regression, random forest, histogram gradient boosting, CatBoost, diagnostics, and feature importance |
-| `notebooks/3_catboost_tuning.ipynb` | CatBoost tuning | Stratified CV, feature variants, class weighting, threshold features, and tuned submission generation |
-| `notebooks/4_reuse_tuning_submission.ipynb` | Fast submission reuse | Validates and reuses the long tuning run output without retraining |
-| `notebooks/5_compact_ensemble_and_thresholds.ipynb` | Compact ensemble | Tests CatBoost/HGB probability blending and conservative `High` threshold rules |
+| `notebooks/1_eda_predict_irrigation_need.ipynb` | Understand data quality, drift, target balance, and feature signal | EDA findings and modeling implications |
+| `notebooks/2_baseline_models.ipynb` | Compare model families with stratified validation | CatBoost selected as strongest baseline |
+| `notebooks/3_catboost_tuning.ipynb` | Test compact CatBoost variants and feature sets | `baseline_interactions` selected by CV macro F1 |
+| `notebooks/4_reuse_tuning_submission.ipynb` | Validate and reuse saved tuning output | Fast, low-risk `submission.csv` |
+| `notebooks/5_compact_ensemble_and_thresholds.ipynb` | Test CatBoost/HGB probability blends and `High` rules | Best CV test: `0.97032` macro F1 |
 
-## Documentation
+## Documentation Map
 
 | Document | Purpose |
 | --- | --- |
@@ -41,75 +114,82 @@ This repository contains a Kaggle-only workflow for the [Playground Series S6E4 
 | `docs/4_catboost_tuning.md` | Logic flow, approach, and results for CatBoost tuning |
 | `docs/5_reuse_tuning_submission.md` | Validation flow and results for submission reuse |
 | `docs/6_output_insights_next_steps.md` | Output interpretation and recommended next experiments |
-| `docs/7_compact_ensemble_and_thresholds.md` | Logic flow and decision rules for the ensemble notebook |
+| `docs/7_compact_ensemble_and_thresholds.md` | Logic flow, results, and decision rules for the ensemble notebook |
 
-## Kaggle Usage
+## Output Review
 
-1. Open the competition on Kaggle and create a new notebook.
-2. Attach the competition dataset if Kaggle has not attached it automatically.
-3. Upload or copy the target notebook from this repo.
-4. Run all cells.
+### Data and EDA
 
-For final submission reuse, attach the output from:
-<https://www.kaggle.com/code/tuannm3823/s6e4-predicting-irrigation-need-catboost-tuning?scriptVersionId=320060317>
+The dataset is clean and stable enough for standard cross-validation:
 
-Then run `notebooks/4_reuse_tuning_submission.ipynb`.
+- no missing values, duplicate rows, or duplicate IDs were observed;
+- train/test drift is low, with largest numeric standardized mean difference
+  around `0.004`;
+- the target is imbalanced: `Low 58.72%`, `Medium 37.95%`, `High 3.33%`.
 
-## Key EDA Findings
+The strongest signals are agronomically coherent: lower soil moisture, lower
+rainfall, higher temperature, higher wind speed, high-risk growth stages, and no
+mulching all increase irrigation-need risk.
 
-- Train/test shape: `630,000` training rows and `270,000` test rows.
-- Target: 3-class `Irrigation_Need` classification.
-- Class balance: `Low 58.72%`, `Medium 37.95%`, `High 3.33%`.
-- Data quality: no missing values, no duplicate rows, and no duplicate IDs.
-- Feature set: `19` predictors, with `11` numeric and `8` categorical.
-- Train/test drift is low: largest numeric standardized mean difference is about `0.004`; largest categorical total variation distance is about `0.0025`.
-- Strongest signals: `Soil_Moisture`, `Rainfall_mm`, `Crop_Growth_Stage`, `Temperature_C`, `Wind_Speed_kmh`, `Previous_Irrigation_mm`, `Humidity`, and `Mulching_Used`.
+### Modeling Results
 
-The most important risk pattern is consistent: lower soil moisture, lower rainfall, higher temperature, higher wind speed, high-risk growth stages, and no mulching are associated with greater irrigation need.
-
-## Modeling Results
-
-CatBoost is the strongest baseline model and remains the best practical submission path.
-
-| Model / Experiment | Validation Result |
+| Model / Experiment | Key Result |
 | --- | --- |
-| CatBoost holdout | Accuracy `0.9851`, macro F1 `0.9711`, balanced accuracy `0.9638`, log loss `0.0602` |
+| CatBoost holdout | Accuracy `0.9851`, macro F1 `0.9711`, log loss `0.0602` |
 | CatBoost `High` class | Precision `0.9653`, recall `0.9205`, F1 `0.9424` |
 | CatBoost CV `baseline_interactions` | Mean macro F1 `0.96994`, mean log loss `0.06088` |
-| CatBoost CV `deeper_interactions` | Better log loss `0.06016`, but no macro F1 improvement |
-| Class-weighted CatBoost | Higher `High` recall around `0.946`, but lower macro F1 and worse log loss |
+| HGB CV | Mean macro F1 `0.96970`, mean log loss `0.05901` |
+| CatBoost + HGB ensemble | Mean macro F1 `0.97022`, log loss `0.05934` |
+| Ensemble + `P(High) >= 0.45` | Mean macro F1 `0.97032`, `High` recall `0.91670` |
 
-Feature importance confirms the EDA story. The top CatBoost drivers are:
+The ensemble improves CV macro F1 by about `0.00038` over the CatBoost CV
+baseline and materially improves log loss. The gain is small but real enough to
+submit and compare, while the original CatBoost submission remains the stable
+fallback.
 
-1. `Soil_Moisture`
-2. `Crop_Growth_Stage`
-3. `Mulching_Used`
-4. `Temperature_C`
-5. `Wind_Speed_kmh`
+### Submission State
 
-EDA interaction features help, but they are secondary to the core agronomic variables.
-
-## Submission Result
-
-The reused CatBoost tuning submission was validated and submitted.
+The validated CatBoost tuning submission has:
 
 | Item | Value |
-| --- | --- |
+| --- | ---: |
 | Public score | `0.96094` |
-| Best score | `0.96094` |
 | Submission rows | `270,000` |
-| Required columns | `id`, `Irrigation_Need` |
-| Prediction mix | `Low 59.23%`, `Medium 37.59%`, `High 3.18%` |
+| Prediction mix: `Low` | `59.23%` |
+| Prediction mix: `Medium` | `37.59%` |
+| Prediction mix: `High` | `3.18%` |
 
-The public score is slightly below the internal CV macro F1 estimate (`0.96994`). This is expected because CV and the public leaderboard are evaluated on different rows, but future improvements should be validated carefully rather than judged from a single holdout split.
+The ensemble notebook generated a new candidate prediction mix:
 
-## Next Steps
+| Class | Share |
+| --- | ---: |
+| `Low` | `59.23%` |
+| `Medium` | `37.57%` |
+| `High` | `3.20%` |
 
-The broad EDA, baseline comparison, and CatBoost tuning work are complete. The next useful modeling direction is not another large CatBoost grid.
+## Current Lessons
 
-Recommended next experiments:
+1. CatBoost is the strongest single-model path, but HGB adds useful probability
+   diversity.
+2. More CatBoost depth improves log loss slightly but does not beat the simpler
+   interaction model on macro F1.
+3. Full class weighting is too blunt: it raises `High` recall but damages macro
+   F1 and log loss.
+4. A conservative `High` probability threshold is a better trade-off than class
+   weighting because it nudges only borderline cases.
+5. The feature story is stable and interpretable, so the next gains should come
+   from validation, ensembling, and decision rules rather than large feature
+   churn.
 
-1. Run `notebooks/5_compact_ensemble_and_thresholds.ipynb` to test a compact ensemble using the strongest CatBoost and histogram gradient boosting variants.
-2. Test probability calibration if leaderboard behavior suggests calibration matters.
-3. Analyze errors for the `High` class before adding more features.
-4. Keep `4_reuse_tuning_submission.ipynb` as the fast path for validating and resubmitting saved outputs.
+## Next Work
+
+1. Submit the ensemble candidate from `5_compact_ensemble_and_thresholds.ipynb`
+   and compare it against the current `0.96094` public score.
+2. If the ensemble improves the leaderboard, update `4_reuse_tuning_submission`
+   or add a reuse notebook for the ensemble output.
+3. Run targeted error analysis for true `High` rows predicted as `Medium` or
+   `Low`.
+4. Test probability calibration only if it improves log loss without reducing
+   macro F1.
+5. Keep the current CatBoost tuning submission as the stable fallback if the
+   ensemble does not generalize.

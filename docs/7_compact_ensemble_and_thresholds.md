@@ -67,7 +67,35 @@ Use the new notebook only if it improves cross-validation clearly. A practical
 minimum improvement is `0.0003` to `0.0005` macro F1. If the ensemble gain is
 smaller, keep the current CatBoost tuning submission as the stable solution.
 
-After running on Kaggle, record:
+## 7.7 Current Output Review
+
+The latest run found a small but useful validation gain:
+
+| Candidate | CV Macro F1 | Log Loss | `High` Recall |
+| --- | ---: | ---: | ---: |
+| CatBoost baseline | `0.96994` | `0.06088` | `0.91294` |
+| HGB | `0.96970` | `0.05901` | `0.91651` |
+| CatBoost `0.70` + HGB `0.30` | `0.97022` | `0.05934` | `0.91385` |
+| Ensemble plus `P(High) >= 0.45` | `0.97032` | `0.05934` | `0.91670` |
+
+The selected candidate uses:
+
+- CatBoost baseline weight `0.70`;
+- histogram gradient boosting weight `0.30`;
+- `P(High) >= 0.45` as the conservative `High` override.
+
+The generated test prediction mix was:
+
+| Class | Share |
+| --- | ---: |
+| `Low` | `59.23%` |
+| `Medium` | `37.57%` |
+| `High` | `3.20%` |
+
+This is still close to the training distribution, so the threshold did not
+over-expand the rare class. The next check is leaderboard confirmation.
+
+After the next Kaggle submission, record:
 
 - best individual model metrics;
 - best ensemble weights;
